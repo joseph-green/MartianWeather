@@ -1,0 +1,147 @@
+
+
+
+<!doctype html>
+<html>
+<head>
+	<title>Mars Weather</title>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> 
+	<style type="text/css">
+		@font-face {
+			font-family: 'Segoe Light';
+			src: url("C:\\Sites\\mars-weather\\segoeuil.ttf");
+		}
+		.page {
+			background-image: url("C:\\Sites\\mars-weather\\mars.jpg");
+			background-repeat: no-repeat;
+			background-size: 100%;
+
+		}
+		body {
+			overflow: hidden;
+			font-family: 'Segoe Light';
+			color: white;
+			text-align: center;
+		}
+		#title {
+			font-size: 6em;
+		}
+		.max, .min {
+			font-size: 4em;
+		}
+		#far {
+			font-size: 0.5em;
+			color: #ddd;
+		}
+		.container-fluid {
+			margin-top: 1em;
+			margin-bottom: 1em;
+		}
+
+
+	</style>
+</head>
+<body>
+	<div class='container-fluid page' style='min-height:100em'>
+		<h1 id='title'>MARS</h1>
+		<span id='date'></span>
+		<span id='image'></span>
+		<div class='temp container-fluid'>
+			<p >Temperature</p>
+			<div class=' col-md-3'></div>
+			<div class='max col-md-3'></div>
+			<div class='min col-md-3'></div>
+			<div class=' col-md-3'></div>
+		</div>
+		<div class='wind container-fluid'>
+			<p >Wind</p>
+			<div class=' col-md-3'></div>
+			<div class='speed col-md-3'></div>
+			<div class='direction col-md-3'></div>
+			<div class=' col-md-3'></div>
+		
+		</div>
+		<div class='sun container-fluid'>
+			<div class=' col-md-3'></div>
+			<div class='rise col-md-3'></div>
+			<div class='set col-md-3'></div>
+			<div class=' col-md-3'></div>
+			
+		</div>
+
+	</div>
+	<script type="text/javascript">
+	var main = function () {
+
+	$.ajax({
+		url: 'http://marsweather.ingenology.com/v1/latest' ,
+		data: {
+			format: 'jsonp'
+		},
+		dataType: 'jsonp',
+		success: function(data) {
+			var $date = data.report.terrestrial_date;
+
+			var $temperature = {
+				"max_celsius": data.report.max_temp,
+				"max_fahrenheit": data.report.max_temp_fahrenheit,
+				"min_celsius": data.report.min_temp,
+				"min_fahrenheit": data.report.min_temp_fahrenheit
+			};
+			var $wind = {
+				"speed": data.report.wind_speed,
+				"direction": data.report.wind_direction
+			};
+			if ($wind.speed == null) {
+				$wind.speed = "--"
+			}
+			var $soleil = {
+				"rise": data.report.sunrise.match(/\d\d\:\d\d\:\d\d/)[0],
+				"set": data.report.sunset.match(/\d\d\:\d\d\:\d\d/)[0]
+			};
+
+			var $description = data.report.atmo_opacity;
+			var $symbol_url;
+			switch ($description) {
+				case "Sunny":
+					$symbol_url = "C:\\Sites\\mars-weather\\sun.png";
+				default:
+					null;
+
+
+			}
+			$('#date').html("<p>" + $date + "</p>")
+			$('#image').html("<img style='height:8em;width:8em;' src='" + $symbol_url + "'>")
+			$('.max').html($temperature.max_celsius + "&degC<span id='far'>" + $temperature.max_fahrenheit + "&degF</span>");
+			$('.min').html($temperature.min_celsius + "&degC<span id='far'>" + $temperature.min_fahrenheit + "&degF</span>");
+			$('.speed').html("<h2> Speed: " + $wind.speed + "</h2>");
+			$('.direction').html("<h2> Direction: " + $wind.direction + "</h2>");
+			$('.rise').html("<p>Sunrise</p><h2>" + $soleil.rise + "</h2>");
+			$('.set').html("<p>Sunset</p><h2>" + $soleil.set + "</h2>");
+
+		
+
+		},
+		type: 'GET'
+	});
+	$.ajax({
+		url: 'https://api.nasa.gov/mars-photos/api/v1/rovers/curiousity/photos' ,
+		data: {
+
+			camera: 'navcam',
+			api_key: '20s6ygRwUxxPa9dg0di8k2lZaDYxaALqr6GznqCv',
+		},
+		dataType: 'jsonp',
+		success: function(data) {
+		},
+		type: 'GET'
+	});
+
+	};
+	$(document).ready(main);
+</script>
+</body>
+</html>
